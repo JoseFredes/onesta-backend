@@ -2,29 +2,31 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  ManyToOne,
   Unique,
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Farmer } from './farmer.entity';
 import { Harvest } from 'src/fruits/entities/harvest.entity';
 
-@Entity('clients')
-@Unique(['email'])
-export class Client {
+@Entity('farms')
+@Unique(['name', 'location'])
+export class Farm {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column({ unique: true })
-  email: string;
 
   @Column()
   name: string;
 
   @Column()
-  lastName: string;
+  location: string;
 
-  @OneToMany(() => Harvest, (harvest) => harvest.client)
+  @ManyToOne(() => Farmer, (farmer) => farmer.farms)
+  farmer: Farmer;
+
+  @OneToMany(() => Harvest, (harvest) => harvest.farm)
   harvests: Harvest[];
 
   @CreateDateColumn({ type: 'datetime' })

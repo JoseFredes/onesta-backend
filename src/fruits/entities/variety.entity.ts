@@ -1,30 +1,31 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column,
+  ManyToOne,
+  JoinColumn,
   Unique,
+  Column,
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Harvest } from 'src/fruits/entities/harvest.entity';
+import { Fruit } from './fruit.entity';
+import { Harvest } from './harvest.entity';
 
-@Entity('clients')
-@Unique(['email'])
-export class Client {
+@Entity('varieties')
+@Unique(['name', 'fruit'])
+export class Variety {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column({ unique: true })
-  email: string;
 
   @Column()
   name: string;
 
-  @Column()
-  lastName: string;
+  @ManyToOne(() => Fruit, (fruit) => fruit.varieties)
+  @JoinColumn({ name: 'id' })
+  fruit: Fruit;
 
-  @OneToMany(() => Harvest, (harvest) => harvest.client)
+  @OneToMany(() => Harvest, (harvest) => harvest.variety)
   harvests: Harvest[];
 
   @CreateDateColumn({ type: 'datetime' })

@@ -2,16 +2,17 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  Unique,
   OneToMany,
+  Unique,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Farm } from './farm.entity';
 import { Harvest } from 'src/fruits/entities/harvest.entity';
 
-@Entity('clients')
+@Entity('farmers')
 @Unique(['email'])
-export class Client {
+export class Farmer {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -24,7 +25,10 @@ export class Client {
   @Column()
   lastName: string;
 
-  @OneToMany(() => Harvest, (harvest) => harvest.client)
+  @OneToMany(() => Farm, (farm) => farm.farmer)
+  farms: Farm[];
+
+  @OneToMany(() => Harvest, (harvest) => harvest.farm)
   harvests: Harvest[];
 
   @CreateDateColumn({ type: 'datetime' })
