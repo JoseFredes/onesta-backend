@@ -4,13 +4,12 @@ import { Farmer } from './entities/farmer.entity';
 import { Farm } from './entities/Farm.entity';
 import { FarmersService } from './services/farmers.service';
 import { FarmersController } from './controllers/farmers.controller';
-import { FarmService } from './farm/farm.service';
-import { FarmsController } from './farms/farms.controller';
 import { FarmsService } from './services/farms.service';
+import { FarmsController } from './controllers/farms.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Farmer, Farm])],
-  providers: [FarmersService, FarmService, FarmsService],
+  providers: [FarmersService, FarmsService, FarmsService],
   controllers: [FarmersController, FarmsController],
 })
 export class FarmersModule {}

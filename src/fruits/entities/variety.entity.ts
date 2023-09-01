@@ -22,7 +22,7 @@ export class Variety {
   name: string;
 
   @ManyToOne(() => Fruit, (fruit) => fruit.varieties)
-  @JoinColumn({ name: 'id' })
+  @JoinColumn({ name: 'fruitId' })
   fruit: Fruit;
 
   @OneToMany(() => Harvest, (harvest) => harvest.variety)

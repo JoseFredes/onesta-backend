@@ -1,8 +1,21 @@
-import { IsString, MinLength, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
-export class VarietyDto {
+export class CreateVarietyDto {
   @IsString()
   @IsNotEmpty()
-  @MinLength(1)
   name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  fruitId?: string;
+}
+
+export class UpdateVarietyDto {
+  @IsString()
+  @IsNotEmpty()
+  name?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  fruitId?: string;
 }
