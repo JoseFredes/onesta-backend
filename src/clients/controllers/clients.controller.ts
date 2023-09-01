@@ -8,9 +8,10 @@ import {
   Delete,
   ValidationPipe,
 } from '@nestjs/common';
-import { ClientDto } from '../dto/client.dto';
+
 import { ClientService } from '../services/clients.service';
 import { Client } from '../entities/client.entity';
+import { CreateClientDto, UpdateClientDto } from '../dto/client.dto';
 
 @Controller('clients')
 export class ClientController {
@@ -27,16 +28,16 @@ export class ClientController {
   }
 
   @Post()
-  createClient(@Body(ValidationPipe) clientDto: ClientDto): Promise<Client> {
-    return this.clientService.createClient(clientDto);
+  createClient(@Body(ValidationPipe) client: CreateClientDto): Promise<Client> {
+    return this.clientService.createClient(client);
   }
 
   @Put(':id')
   updateClient(
     @Param('id') id: string,
-    @Body(ValidationPipe) clientDto: ClientDto,
+    @Body(ValidationPipe) client: UpdateClientDto,
   ): Promise<Client> {
-    return this.clientService.updateClient(id, clientDto);
+    return this.clientService.updateClient(id, client);
   }
 
   @Delete(':id')
