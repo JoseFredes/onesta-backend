@@ -34,14 +34,13 @@ export class ClientController {
 
     try {
       const client = await this.clientService.findOne(params.email);
-      if (!client) {
+      if (!client)
         throw new NotFoundException(`Client with ${params.email} not found`);
-      }
+
       return client;
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
+      if (error instanceof NotFoundException) throw error;
+
       throw new InternalServerErrorException('Error to get client');
     }
   }
@@ -53,9 +52,9 @@ export class ClientController {
     try {
       return await this.clientService.createClient(client);
     } catch (error) {
-      if (error.message.includes('Validation failed')) {
+      if (error.message.includes('Validation failed'))
         throw new BadRequestException(error.message);
-      }
+
       throw new InternalServerErrorException('Error to create client');
     }
   }
