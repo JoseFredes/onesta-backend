@@ -1,39 +1,57 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Fruit } from '../entities/fruit.entity';
-import { CreateFruitDto, UpdateFruitDto } from '../dto/fruit.dto';
+import { CreateFruitDto } from '../dto/fruit.dto';
+import { HandleErrorService } from 'src/common/errors/handle-errors.service';
 
 @Injectable()
 export class FruitsService {
   constructor(
     @InjectRepository(Fruit)
     private fruitRepository: Repository<Fruit>,
+    private readonly handleErrorService: HandleErrorService,
   ) {}
 
   findAll(): Promise<Fruit[]> {
     return this.fruitRepository.find();
   }
 
-  findOne(id: string): Promise<Fruit> {
-    return this.fruitRepository.findOne({ where: { id } });
+  async findOne(name: string): Promise<Fruit> {
+    if (!name) throw new NotFoundException('Name not provided');
+
+    const fruit = await this.fruitRepository.findOne({ where: { name: name } });
+
+    if (!fruit)
+      throw new NotFoundException(`Fruit with name ${name} not found`);
+
+    return fruit;
   }
 
-  create(createFruitDto: CreateFruitDto): Promise<Fruit> {
-    const fruit = new Fruit();
-    fruit.name = createFruitDto.name;
-    return this.fruitRepository.save(fruit);
-  }
+  async create(createFruitDto: CreateFruitDto): Promise<Fruit> {
+    try {
+      const existingFruit = await this.fruitRepository.findOne({
+        where: { name: createFruitDto.name },
+      });
 
-  async update(id: string, updateFruitDto: UpdateFruitDto): Promise<Fruit> {
-    const fruit = await this.fruitRepository.findOne({ where: { id } });
-    if (updateFruitDto.name) {
-      fruit.name = updateFruitDto.name;
+      if (existingFruit)
+        throw new ConflictException(
+          `Fruit with name ${createFruitDto.name} already exists`,
+        );
+
+      const fruit = new Fruit();
+      fruit.name = createFruitDto.name;
+      return this.fruitRepository.save(fruit);
+    } catch (error) {
+      throw this.handleErrorService.handleErrorExceptions(
+        'FruitService',
+        'create',
+        error,
+      );
     }
-    return this.fruitRepository.save(fruit);
-  }
-
-  async remove(id: string): Promise<void> {
-    await this.fruitRepository.delete(id);
   }
 }
