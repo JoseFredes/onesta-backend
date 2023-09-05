@@ -1,6 +1,6 @@
 import { IsString, MinLength, IsNotEmpty, IsEmail } from 'class-validator';
 
-export class FarmerDto {
+export class CreateFarmerDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(3)

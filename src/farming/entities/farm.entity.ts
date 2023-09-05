@@ -7,6 +7,7 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { Farmer } from './farmer.entity';
 import { Harvest } from 'src/fruits/entities/harvest.entity';
@@ -23,7 +24,14 @@ export class Farm {
   @Column()
   location: string;
 
-  @ManyToOne(() => Farmer, (farmer) => farmer.farms)
+  @Column()
+  farmerId: string;
+
+  @ManyToOne(() => Farmer, (farmer) => farmer.farms, {
+    eager: true,
+    cascade: true,
+  })
+  @JoinColumn({ name: 'farmerId' })
   farmer: Farmer;
 
   @OneToMany(() => Harvest, (harvest) => harvest.farm)

@@ -16,7 +16,7 @@ export class Farmer {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
+  @Column()
   email: string;
 
   @Column()
@@ -28,7 +28,7 @@ export class Farmer {
   @OneToMany(() => Farm, (farm) => farm.farmer)
   farms: Farm[];
 
-  @OneToMany(() => Harvest, (harvest) => harvest.farm)
+  @OneToMany(() => Harvest, (harvest) => harvest.farmer)
   harvests: Harvest[];
 
   @CreateDateColumn({ type: 'datetime' })
