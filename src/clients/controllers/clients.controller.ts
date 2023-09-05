@@ -33,9 +33,9 @@ export class ClientController {
     if (!email) throw new BadRequestException('Invalid email format');
 
     try {
-      const client = await this.clientService.findOne(params.email);
+      const client = await this.clientService.findOne(email);
       if (!client)
-        throw new NotFoundException(`Client with ${params.email} not found`);
+        throw new NotFoundException(`Client with ${email} not found`);
 
       return client;
     } catch (error) {
