@@ -1,15 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { VarietyService } from '../services/variety.service';
 import { Variety } from '../entities/variety.entity';
-import { CreateVarietyDto, UpdateVarietyDto } from '../dto/variety.dto';
+import { CreateVarietyDto } from '../dto/variety.dto';
 
 @Controller('varieties')
 export class VarietyController {
@@ -20,26 +12,16 @@ export class VarietyController {
     return this.varietyService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<Variety> {
-    return this.varietyService.findOne(id);
+  @Get(':fruit/:variety')
+  findOne(
+    @Param('fruit') fruitName: string,
+    @Param('variety') varietyName: string,
+  ): Promise<Variety> {
+    return this.varietyService.findOne(varietyName, fruitName);
   }
 
   @Post()
   create(@Body() createVarietyDto: CreateVarietyDto): Promise<Variety> {
     return this.varietyService.create(createVarietyDto);
-  }
-
-  @Put(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateVarietyDto: UpdateVarietyDto,
-  ): Promise<Variety> {
-    return this.varietyService.update(id, updateVarietyDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
-    return this.varietyService.remove(id);
   }
 }

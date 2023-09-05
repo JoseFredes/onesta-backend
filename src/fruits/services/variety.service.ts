@@ -1,43 +1,55 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Variety } from '../entities/variety.entity';
-import { CreateVarietyDto, UpdateVarietyDto } from '../dto/variety.dto';
+import { CreateVarietyDto } from '../dto/variety.dto';
+import { Fruit } from '../entities/fruit.entity';
 
 @Injectable()
 export class VarietyService {
   constructor(
     @InjectRepository(Variety)
     private varietyRepository: Repository<Variety>,
+    @InjectRepository(Fruit)
+    private readonly fruitRepository: Repository<Fruit>,
   ) {}
 
   findAll(): Promise<Variety[]> {
     return this.varietyRepository.find();
   }
 
-  findOne(id: string): Promise<Variety> {
-    return this.varietyRepository.findOne({ where: { id } });
+  async findOne(varietyName: string, fruitName: string): Promise<Variety> {
+    const fruit = await this.fruitRepository.findOne({
+      where: { name: fruitName },
+    });
+    if (!fruit) {
+      throw new Error('Fruit not found');
+    }
+    const foundFuitName = fruit.name;
+    return this.varietyRepository
+      .createQueryBuilder('variety')
+      .innerJoin('variety.fruit', 'fruit')
+      .where('variety.name = :varietyName', { varietyName })
+      .andWhere('fruit.name= :fruitName', { foundFuitName })
+      .getOne();
   }
 
-  create(varietyPayload: CreateVarietyDto): Promise<Variety> {
+  async create(varietyPayload: CreateVarietyDto): Promise<Variety> {
+    const fuitName = varietyPayload.fruit;
+    const fruit = await this.fruitRepository.findOne({
+      where: { name: fuitName },
+    });
+
+    if (!fruit) {
+      throw new NotFoundException(
+        `Fruit with name ${varietyPayload.fruit} not found`,
+      );
+    }
+
     const variety = new Variety();
     variety.name = varietyPayload.name;
-    variety.fruit = { id: varietyPayload.fruitId } as any;
-    return this.varietyRepository.save(variety);
-  }
+    variety.fruit = fruit;
 
-  async update(id: string, varietyPayload: UpdateVarietyDto): Promise<Variety> {
-    const variety = await this.varietyRepository.findOne({ where: { id } });
-    if (varietyPayload.name) {
-      variety.name = varietyPayload.name;
-    }
-    if (varietyPayload.fruitId) {
-      variety.fruit = { id: varietyPayload.fruitId } as any;
-    }
     return this.varietyRepository.save(variety);
-  }
-
-  async remove(id: string): Promise<void> {
-    await this.varietyRepository.delete(id);
   }
 }
