@@ -7,6 +7,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
   NotFoundException,
+  ValidationPipe,
 } from '@nestjs/common';
 import { FarmersService } from '../services/farmers.service';
 import { Farmer } from '../entities/farmer.entity';
@@ -40,7 +41,14 @@ export class FarmersController {
   }
 
   @Post()
-  create(@Body() farmer: Farmer): Promise<Farmer> {
-    return this.farmerService.createFarmer(farmer);
+  create(@Body(ValidationPipe) farmer: Farmer): Promise<Farmer> {
+    try {
+      return this.farmerService.createFarmer(farmer);
+    } catch (error) {
+      if (error.message.includes('Validation failed'))
+        throw new BadRequestException(error.message);
+
+      throw new InternalServerErrorException('Error to create farmer');
+    }
   }
 }
