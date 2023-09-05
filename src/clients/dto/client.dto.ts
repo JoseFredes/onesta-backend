@@ -15,19 +15,3 @@ export class CreateClientDto {
   @IsNotEmpty()
   email: string;
 }
-
-export class UpdateClientDto {
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(3)
-  name?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(3)
-  lastName?: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  email?: string;
-}

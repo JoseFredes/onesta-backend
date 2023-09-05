@@ -1,46 +1,54 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Client } from '../entities/client.entity';
+import { CreateClientDto } from '../dto/client.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { HandleErrorService } from 'src/common/errors/handle-errors.service';
 
 @Injectable()
 export class ClientService {
   constructor(
     @InjectRepository(Client)
     private clientRepository: Repository<Client>,
+    private readonly handleErrorService: HandleErrorService,
   ) {}
 
   async findAll(): Promise<Client[]> {
     return this.clientRepository.find();
   }
 
-  async findOne(id: string): Promise<Client> {
-    if (!id) throw new NotFoundException('ID not provided');
+  async findOne(email: string): Promise<Client> {
+    if (!email) throw new NotFoundException('email not provemailed');
 
-    const client = await this.clientRepository.findOne({ where: { id: id } });
+    const client = await this.clientRepository.findOne({
+      where: { email: email },
+    });
 
-    if (!client) throw new NotFoundException(`Client with ID ${id} not found`);
+    if (!client)
+      throw new NotFoundException(`Client with email ${email} not found`);
 
     return client;
   }
 
-  async createClient(clientData: Partial<Client>): Promise<Client> {
-    const client = this.clientRepository.create(clientData);
-    return this.clientRepository.save(client);
-  }
+  async createClient(clientData: Partial<CreateClientDto>): Promise<Client> {
+    try {
+      const existingClient = await this.clientRepository.findOne({
+        where: { email: clientData.email },
+      });
 
-  async updateClient(id: string, clientData: Partial<Client>): Promise<Client> {
-    if (!id) throw new NotFoundException('ID not provided');
+      if (existingClient)
+        throw new NotFoundException(
+          `Client with email ${clientData.email} already exists`,
+        );
 
-    await this.findOne(id);
-    await this.clientRepository.update(id, clientData);
-    return this.findOne(id);
-  }
-
-  async removeClient(id: string): Promise<void> {
-    if (!id) throw new NotFoundException('ID not provided');
-
-    await this.findOne(id);
-    await this.clientRepository.delete(id);
+      const client = this.clientRepository.create(clientData);
+      return this.clientRepository.save(client);
+    } catch (error) {
+      throw this.handleErrorService.handleErrorExceptions(
+        'ClientService',
+        'createClient',
+        error,
+      );
+    }
   }
 }
