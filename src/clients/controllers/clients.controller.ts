@@ -2,13 +2,16 @@ import {
   Controller,
   Get,
   Post,
-  Body,
   Param,
+  Body,
+  NotFoundException,
+  BadRequestException,
+  InternalServerErrorException,
   ValidationPipe,
 } from '@nestjs/common';
-
 import { Client } from '../entities/client.entity';
 import { CreateClientDto } from '../dto/client.dto';
+import { EmailDto } from 'src/common/dto/common.dto';
 import { ClientService } from '../services/clients.service';
 
 @Controller('clients')
@@ -16,17 +19,44 @@ export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
   @Get()
-  findAll(): Promise<Client[]> {
-    return this.clientService.findAll();
+  async findAll(): Promise<Client[]> {
+    try {
+      return await this.clientService.findAll();
+    } catch (error) {
+      throw new InternalServerErrorException('Error to get all clients');
+    }
   }
 
   @Get(':email')
-  findOne(@Param('email') email: string): Promise<Client> {
-    return this.clientService.findOne(email);
+  async findOne(@Param('email') params: EmailDto): Promise<Client> {
+    const email = params.email;
+    if (!email) throw new BadRequestException('Invalid email format');
+
+    try {
+      const client = await this.clientService.findOne(params.email);
+      if (!client) {
+        throw new NotFoundException(`Client with ${params.email} not found`);
+      }
+      return client;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Error to get client');
+    }
   }
 
   @Post()
-  createClient(@Body(ValidationPipe) client: CreateClientDto): Promise<Client> {
-    return this.clientService.createClient(client);
+  async createClient(
+    @Body(ValidationPipe) client: CreateClientDto,
+  ): Promise<Client> {
+    try {
+      return await this.clientService.createClient(client);
+    } catch (error) {
+      if (error.message.includes('Validation failed')) {
+        throw new BadRequestException(error.message);
+      }
+      throw new InternalServerErrorException('Error to create client');
+    }
   }
 }
