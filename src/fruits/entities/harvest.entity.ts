@@ -17,25 +17,25 @@ export class Harvest {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Farm, (farm) => farm.harvests)
-  @JoinColumn({ name: 'farmId' })
-  farm: Farm;
-
-  @ManyToOne(() => Fruit, (fruit) => fruit.harvests)
-  @JoinColumn({ name: 'fruitId' })
-  fruit: Fruit;
-
-  @ManyToOne(() => Variety, (variety) => variety.harvests)
-  @JoinColumn({ name: 'varietyId' })
-  variety: Variety;
+  @ManyToOne(() => Farmer, (farmer) => farmer.harvests)
+  @JoinColumn({ name: 'farmer' })
+  farmer: string;
 
   @ManyToOne(() => Client, (client) => client.harvests)
-  @JoinColumn({ name: 'clientId' })
-  client: Client;
+  @JoinColumn({ name: 'client' })
+  client: string;
 
-  @ManyToOne(() => Farmer, (farmer) => farmer.harvests)
-  @JoinColumn({ name: 'farmerId' })
-  farmer: Farmer;
+  @ManyToOne(() => Farm, (farm) => farm.harvests)
+  @JoinColumn({ name: 'farm' })
+  farm: string;
+
+  @ManyToOne(() => Fruit, (fruit) => fruit.harvests)
+  @JoinColumn({ name: 'fruit' })
+  fruit: string;
+
+  @ManyToOne(() => Variety, (variety) => variety.harvests)
+  @JoinColumn({ name: 'variety' })
+  variety: string;
 
   @CreateDateColumn({ type: 'datetime' })
   createdAt: Date;

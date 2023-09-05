@@ -5,9 +5,3 @@ export class CreateFruitDto {
   @IsNotEmpty()
   name: string;
 }
-
-export class UpdateFruitDto {
-  @IsString()
-  @IsNotEmpty()
-  name?: string;
-}

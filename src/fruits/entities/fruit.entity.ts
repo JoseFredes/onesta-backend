@@ -22,7 +22,7 @@ export class Fruit {
   @OneToMany(() => Variety, (variety) => variety.fruit)
   varieties: Variety[];
 
-  @OneToMany(() => Harvest, (harvest) => harvest.farm)
+  @OneToMany(() => Harvest, (harvest) => harvest.fruit)
   harvests: Harvest[];
 
   @CreateDateColumn({ type: 'datetime' })
