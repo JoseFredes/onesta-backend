@@ -26,11 +26,15 @@ export class VarietyService {
       throw new Error('Fruit not found');
     }
     const foundFuitName = fruit.name;
-    return this.varietyRepository
+    return await this.varietyRepository
       .createQueryBuilder('variety')
-      .innerJoin('variety.fruit', 'fruit')
-      .where('variety.name = :varietyName', { varietyName })
-      .andWhere('fruit.name= :fruitName', { foundFuitName })
+      .innerJoinAndSelect('variety.fruit', 'fruit')
+      .where('variety.name = :varietyName', {
+        varietyName: varietyName,
+      })
+      .andWhere('fruit.name = :fruitName', {
+        fruitName: foundFuitName,
+      })
       .getOne();
   }
 

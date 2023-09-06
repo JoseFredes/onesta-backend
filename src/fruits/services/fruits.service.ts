@@ -22,7 +22,7 @@ export class FruitsService {
   }
 
   async findOne(name: string): Promise<Fruit> {
-    if (!name) throw new NotFoundException('Name not provided');
+    if (!name.length) throw new NotFoundException('Name not provided');
 
     const fruit = await this.fruitRepository.findOne({ where: { name: name } });
 

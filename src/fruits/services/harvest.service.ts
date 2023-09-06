@@ -35,6 +35,18 @@ export class HarvestService {
     private readonly handleErrorService: HandleErrorService,
   ) {}
 
+  async findAll(): Promise<Harvest[]> {
+    try {
+      return await this.harvestRepository.find();
+    } catch (error) {
+      throw this.handleErrorService.handleErrorExceptions(
+        'HarvestService',
+        'findAll',
+        error,
+      );
+    }
+  }
+
   async create(createHarvestDto: CreateHarvestDto): Promise<Harvest> {
     try {
       const harvest = new Harvest();
@@ -56,6 +68,7 @@ export class HarvestService {
 
     const findOrCreateEntity = async (repository, criteria, data) => {
       let entity = await repository.findOne({ where: criteria });
+
       if (repository === this.varietyRepository) {
         entity = await repository
           .createQueryBuilder('variety')
@@ -169,7 +182,6 @@ export class HarvestService {
     }
 
     try {
-      console.log(harvests);
       await this.harvestRepository.save(harvests);
     } catch (error) {
       console.error('Error saving harvests', error);
