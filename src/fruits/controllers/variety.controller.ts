@@ -1,4 +1,11 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  ValidationPipe,
+} from '@nestjs/common';
 import { VarietyService } from '../services/variety.service';
 import { Variety } from '../entities/variety.entity';
 import { CreateVarietyDto } from '../dto/variety.dto';
@@ -17,11 +24,23 @@ export class VarietyController {
     @Param('fruit') fruitName: string,
     @Param('variety') varietyName: string,
   ): Promise<Variety> {
-    return this.varietyService.findOne(varietyName, fruitName);
+    if (!fruitName || !varietyName)
+      throw new Error('Invalid fruit or variety format');
+    try {
+      return this.varietyService.findOne(fruitName, varietyName);
+    } catch (error) {
+      throw new Error('Error to get variety');
+    }
   }
 
   @Post()
-  create(@Body() createVarietyDto: CreateVarietyDto): Promise<Variety> {
-    return this.varietyService.create(createVarietyDto);
+  create(
+    @Body(ValidationPipe) createVarietyDto: CreateVarietyDto,
+  ): Promise<Variety> {
+    try {
+      return this.varietyService.create(createVarietyDto);
+    } catch (error) {
+      throw new Error('Error to create variety');
+    }
   }
 }
